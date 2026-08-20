@@ -1,0 +1,7 @@
+# The dsh-zgit bundle patch: one host-plane row registering the zgit_*
+# tools (global tools layer) plus the /zgit human command when the deployment
+# mounts the command registry. Installed into a profile via
+# `dsh plugin --profile <name> add ./dsh-zgit` (or `add github:you/dsh-zgit`).
+- insert:
+    - id: zgit
+      name: dsh-zgit

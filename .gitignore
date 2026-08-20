@@ -1,0 +1,13 @@
+node_modules/
+lib/
+dist/
+.debug/
+.vite/
+.vite-temp/
+coverage/
+.npm-cache/
+*.tsbuildinfo
+*.tgz
+.DS_Store
+Thumbs.db
+*.log
