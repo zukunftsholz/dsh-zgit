@@ -1,0 +1,25 @@
+# dsh-zgit
+
+> dsh-zgit (zgit) is a DeepSeek Harness (dsh) plugin that fetches source archives and binary releases from git hosts (GitHub, GitLab, Gitee) over plain HTTPS — no git binary, no clone, zero runtime dependencies.
+
+dsh-zgit reimplements the read side of git over forge APIs, so a DSH agent can obtain source code and release artifacts without a git binary on the machine.
+
+Key facts:
+- Install: `dsh plugin --profile web add github:zukunftsholz/dsh-zgit`
+- Targets DeepSeek Harness 0.1.5-rc.2 (cordis 4.0.2, schemastery 3.18.2).
+- Zero runtime dependencies (Node builtins only). No git binary required.
+- Tools: zgit_ls_remote, zgit_clone, zgit_fetch_release, zgit_show, zgit_ls_tree, zgit_log, zgit_diff, zgit_status, zgit_download — plus a human-plane `/zgit` slash command.
+- Hosts: GitHub, GitLab (API v4, nested groups), Gitee (API v5); generic GitHub-style self-hosted hosts for archive/raw URL guessing.
+- Source fetching produces a simulated checkout: a normal directory with `.zerogit/meta.json` and `.zerogit/HEAD`.
+- Verification: sha256 for release assets and zgit_download; CRC32 for zip entries; gzip bomb guard; workspace-confined writes.
+- License: MIT.
+
+## Links
+
+- Homepage: https://zukunftsholz.github.io/dsh-zgit/
+- Source code: https://github.com/zukunftsholz/dsh-zgit
+- Releases: https://github.com/zukunftsholz/dsh-zgit/releases
+- Issues: https://github.com/zukunftsholz/dsh-zgit/issues
+- README (English): https://github.com/zukunftsholz/dsh-zgit/blob/main/README.md
+- README (中文): https://github.com/zukunftsholz/dsh-zgit/blob/main/README.zh.md
+- Framework: DeepSeek Harness — https://github.com/deepseek-ai/deepseek-harness

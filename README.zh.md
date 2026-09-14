@@ -2,9 +2,11 @@
 
 [English](./README.md) | 中文
 
-**零 git（zgit）** —— 一个 DeepSeek Harness 插件：当需要从 git 仓库拉取源代码或二进制发行版时，第一想法不再是 `git clone`，而是更敏捷的纯 HTTPS 方案（甚至直接"模拟 git"）。
+**dsh-zgit**（`/zgit` 插件）是一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（dsh）插件：当需要从 git 仓库拉取源代码或二进制发行版时，第一想法不再是 `git clone`，而是更敏捷的纯 HTTPS 方案（甚至直接"模拟 git"）。
 
-`dsh-zgit` 无需 git 二进制、零运行时依赖：
+它**无需 git 二进制、零运行时依赖**：
+
+**文档：** https://zukunftsholz.github.io/dsh-zgit/
 
 - **源代码** → 直接下载代码托管平台的源码归档（codeload 风格的 tar.gz/zip），解压成带 `.zerogit` 元数据的**模拟检出目录**（simulated checkout），可以查看、`status` 检查、随时刷新。
 - **二进制发行版** → 从 GitHub / GitLab / Gitee 的 Releases 直接列出或下载产物，支持 sha256 校验（自动识别随包发布的校验文件）。
@@ -97,6 +99,32 @@ npm run build      # scripts/build.sh（DSH checkout + junction + tsc），由 n
 npm run typecheck
 npm test           # vitest：解析/glob 单测、tar.gz+zip 解压、平台 fixture、真实 HTTP 端到端、Cordis 挂载
 ```
+
+## 常见问题（FAQ）
+
+**dsh-zgit 是什么？**
+dsh-zgit（zgit）是一个 DeepSeek Harness 插件，通过纯 HTTPS 从 git 仓库拉取源码归档与发行版产物，不需要 git 二进制，也不引入运行时依赖。
+
+**需要先装 git 吗？**
+不需要。全部走托管平台的归档、原始文件与 Release 接口。
+
+**支持哪些平台？**
+GitHub、GitLab（API v4，支持嵌套分组）、Gitee（API v5）。通用 GitHub 风格自建主机（Gitea、GitHub Enterprise）的归档/原始文件 URL 可用；依赖 API 的操作会明确报错，可改用 `archiveUrl` 或 `zgit_download`。
+
+**怎么安装？**
+`dsh plugin --profile web add github:zukunftsholz/dsh-zgit`，本地检出用 `./dsh-zgit`。
+
+**它能替代 git 吗？**
+它用平台 API 重新实现了 git 的"读"侧（`ls-remote`、`show`、`ls-tree`、`log`、`diff`、`status`），外加发行版产物下载；不做写操作、不 push。
+
+**下载会校验吗？**
+发行版产物与 `zgit_download` 支持按随包校验文件做 sha256 校验；zip 条目做 CRC32 校验；gzip 解压设硬上限（防解压炸弹）。
+
+**面向哪个 DSH 版本？**
+DSH 0.1.5-rc.2（cordis 4.0.2、schemastery 3.18.2）。
+
+**许可证？**
+MIT。
 
 ## License
 

@@ -53,15 +53,29 @@
     "node": ">=20.15"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zukunftsholz/dsh-zgit.git"
+  },
+  "homepage": "https://zukunftsholz.github.io/dsh-zgit/",
+  "bugs": {
+    "url": "https://github.com/zukunftsholz/dsh-zgit/issues"
+  },
   "keywords": [
     "dsh",
     "deepseek-harness",
+    "deepseek",
     "plugin",
     "git",
+    "git-alternative",
+    "zero-git",
     "download",
     "codeload",
+    "archive",
     "release",
-    "zero-git"
+    "sha256",
+    "gitlab",
+    "gitee"
   ],
   "author": "zukunftsholz"
 }

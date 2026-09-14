@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dsh-zgit — zero-git source &amp; release fetcher for DeepSeek Harness</title>
+<meta name="description" content="dsh-zgit (zgit) is a DeepSeek Harness (dsh) plugin that fetches source archives and binary releases from GitHub, GitLab and Gitee over plain HTTPS — no git binary, no clone, zero runtime dependencies.">
+<meta name="keywords" content="dsh-zgit, zgit, DeepSeek Harness, dsh plugin, git alternative, no git clone, codeload, release download, GitHub, GitLab, Gitee">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://zukunftsholz.github.io/dsh-zgit/">
+
+<!-- Open Graph / social -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="dsh-zgit — zero-git source &amp; release fetcher for DeepSeek Harness">
+<meta property="og:description" content="Fetch source archives and binary releases from git hosts over plain HTTPS. No git binary, no clone, zero runtime dependencies. A DeepSeek Harness plugin.">
+<meta property="og:url" content="https://zukunftsholz.github.io/dsh-zgit/">
+<meta property="og:site_name" content="dsh-zgit">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="dsh-zgit — zero-git source &amp; release fetcher for DeepSeek Harness">
+<meta name="twitter:description" content="Fetch source archives and binary releases from git hosts over plain HTTPS. No git binary, no clone, no runtime dependencies.">
+
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#5b6470; --line:#e6e8eb;
+    --card:#f7f8fa; --accent:#1f6feb; --code-bg:#f2f4f7; --code-fg:#24292f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0d1117; --fg:#e6edf3; --muted:#9aa4b2; --line:#21262d;
+           --card:#161b22; --accent:#58a6ff; --code-bg:#161b22; --code-fg:#e6edf3; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:820px;margin:0 auto;padding:48px 22px 80px}
+  h1{font-size:2rem;margin:0 0 6px;letter-spacing:-.01em}
+  h2{font-size:1.25rem;margin:38px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  h3{font-size:1rem;margin:22px 0 8px}
+  p{margin:10px 0}
+  .tag{color:var(--muted);font-size:1.05rem;margin:0 0 18px}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .links{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
+  .links a{border:1px solid var(--line);border-radius:8px;padding:7px 13px;font-size:.94rem;color:var(--fg);background:var(--card)}
+  .links a:hover{border-color:var(--accent);text-decoration:none}
+  code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+  code{background:var(--code-bg);color:var(--code-fg);padding:1px 6px;border-radius:5px;font-size:.88em}
+  pre{background:var(--code-bg);color:var(--code-fg);padding:14px 16px;border-radius:10px;overflow:auto;font-size:.9rem;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.94rem}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--muted);font-weight:600}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+  .faq h3{margin-top:20px}
+  .muted{color:var(--muted)}
+  hr{border:0;border-top:1px solid var(--line);margin:40px 0}
+  footer{color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <h1>dsh-zgit</h1>
+  <p class="tag">Zero-git source &amp; release fetcher for DeepSeek Harness</p>
+
+  <div class="links">
+    <a href="https://github.com/zukunftsholz/dsh-zgit">GitHub repo</a>
+    <a href="https://github.com/zukunftsholz/dsh-zgit/releases">Releases</a>
+    <a href="https://github.com/zukunftsholz/dsh-zgit/issues">Issues</a>
+    <a href="https://github.com/zukunftsholz/dsh-zgit/blob/main/README.zh.md">中文文档</a>
+  </div>
+
+  <div class="card">
+    <strong>Install</strong>
+    <pre>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</pre>
+  </div>
+
+  <h2>What is dsh-zgit?</h2>
+  <p><strong>dsh-zgit</strong> (the <code>/zgit</code> plugin) is a <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a> (dsh) plugin for when the first thought about fetching source code or binary releases from a git host should <em>not</em> be <code>git clone</code>.</p>
+  <p>It fetches over plain HTTPS, with <strong>no git binary</strong> and <strong>zero runtime dependencies</strong>:</p>
+  <ul>
+    <li><strong>Source code</strong> → downloaded as a forge archive (codeload-style tar.gz/zip), extracted into a <strong>simulated checkout</strong> with <code>.zerogit</code> metadata you can inspect, status-check and refresh.</li>
+    <li><strong>Binary releases</strong> → release assets listed or downloaded from GitHub / GitLab / Gitee releases, with sha256 verification against shipped checksum files.</li>
+    <li><strong>git, simulated</strong> → <code>zgit_ls_remote</code>, <code>zgit_show</code>, <code>zgit_ls_tree</code>, <code>zgit_log</code>, <code>zgit_diff</code>, <code>zgit_status</code> reimplement the read side of git over the forge APIs.</li>
+    <li><strong>Anything else</strong> → <code>zgit_download</code> fetches any direct URL into the workspace, with a byte cap and optional sha256.</li>
+  </ul>
+
+  <h2>Tools</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>git analog</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>zgit_ls_remote</code></td><td><code>git ls-remote</code></td><td>Branches, tags, ref→sha resolution, default branch, latest release tag.</td></tr>
+      <tr><td><code>zgit_clone</code></td><td><code>git clone</code> / <code>git archive</code></td><td>Downloads the source archive at a ref, extracts it as a simulated checkout (<code>.zerogit/meta.json</code>); supports <code>subdir</code> sparse extraction and explicit archive URLs.</td></tr>
+      <tr><td><code>zgit_fetch_release</code></td><td><code>gh release download</code></td><td>Lists or downloads release assets (latest or a tag) with glob patterns and sha256 verification.</td></tr>
+      <tr><td><code>zgit_show</code></td><td><code>git show</code></td><td>Fetches one raw file at a ref.</td></tr>
+      <tr><td><code>zgit_ls_tree</code></td><td><code>git ls-tree</code></td><td>Lists files/dirs at a ref via the forge API.</td></tr>
+      <tr><td><code>zgit_log</code></td><td><code>git log</code></td><td>Recent commits at a ref.</td></tr>
+      <tr><td><code>zgit_diff</code></td><td><code>git diff</code></td><td>Compare two refs: changed-files summary or a single-file unified diff.</td></tr>
+      <tr><td><code>zgit_status</code></td><td><code>git status</code> + <code>git fetch</code></td><td>Checks a simulated checkout against the remote: moved ref, commits behind.</td></tr>
+      <tr><td><code>zgit_download</code></td><td><code>curl</code></td><td>Any direct HTTPS download into the workspace, capped, with optional sha256.</td></tr>
+    </tbody>
+  </table>
+  <p>Plus the human-plane command <code>/zgit</code> (Web UI slash menu / TUI): <code>clone</code>, <code>get</code>, <code>show</code>, <code>ls</code>, <code>log</code>, <code>diff</code>, <code>resolve</code>, <code>status</code>, <code>download</code> — the same operations without the model in the loop.</p>
+
+  <h2>Forge support</h2>
+  <ul>
+    <li><strong>GitHub</strong> — github.com + api.github.com + codeload.github.com + raw.githubusercontent.com</li>
+    <li><strong>GitLab</strong> — gitlab.com + API v4, including nested groups</li>
+    <li><strong>Gitee</strong> — gitee.com + API v5</li>
+    <li><strong>Generic</strong> GitHub-style hosts (Gitea, GitHub Enterprise) — archive/raw URL guessing works; API-backed operations report a clear error, falling back to <code>archiveUrl</code> or <code>zgit_download</code></li>
+  </ul>
+  <p class="muted">Repo references accept <code>owner/repo</code>, <code>owner/repo@ref</code>, full <code>https://</code> URLs, <code>git@host:owner/repo.git</code>, and <code>ssh://</code> URLs.</p>
+
+  <h2 id="faq">FAQ</h2>
+  <div class="faq">
+    <h3>What is dsh-zgit?</h3>
+    <p>dsh-zgit (zgit) is a DeepSeek Harness plugin that fetches source archives and release assets from git hosts over plain HTTPS. It needs no git binary and adds no runtime dependencies.</p>
+    <h3>Do I need git installed?</h3>
+    <p>No. Everything runs over HTTPS against the forge's archive, raw-file and release endpoints.</p>
+    <h3>Which git hosts are supported?</h3>
+    <p>GitHub, GitLab (API v4, nested groups) and Gitee (API v5). Generic GitHub-style self-hosted hosts (Gitea, GitHub Enterprise) work for archive/raw URL guessing.</p>
+    <h3>How do I install it?</h3>
+    <p><code>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</code> — or <code>./dsh-zgit</code> for a local checkout.</p>
+    <h3>Is it a git replacement?</h3>
+    <p>It reimplements the read side of git (<code>ls-remote</code>, <code>show</code>, <code>ls-tree</code>, <code>log</code>, <code>diff</code>, <code>status</code>) over the forge APIs, plus release-asset download. It does not do writes or pushes.</p>
+    <h3>Are downloads verified?</h3>
+    <p>Release assets and <code>zgit_download</code> support sha256 verification against shipped checksum files. Zip entries are CRC32-verified; gzip is decompressed under a hard cap (bomb guard).</p>
+    <h3>Which DSH version does it target?</h3>
+    <p>DSH 0.1.5-rc.2 (cordis 4.0.2, schemastery 3.18.2).</p>
+    <h3>What license is dsh-zgit?</h3>
+    <p>MIT.</p>
+  </div>
+
+  <hr>
+
+  <h2 id="zh">中文简介</h2>
+  <p><strong>dsh-zgit</strong>（<code>/zgit</code> 插件）是一个 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>（dsh）插件：当需要从 git 仓库拉取源代码或二进制发行版时，第一想法不再是 <code>git clone</code>，而是更敏捷的纯 HTTPS 方案。它<strong>无需 git 二进制、零运行时依赖</strong>。</p>
+  <p>安装：</p>
+  <pre>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</pre>
+  <ul>
+    <li><strong>源代码</strong> → 下载代码托管平台的源码归档（codeload 风格 tar.gz/zip），解压成带 <code>.zerogit</code> 元数据的模拟检出目录。</li>
+    <li><strong>二进制发行版</strong> → 从 GitHub / GitLab / Gitee 的 Releases 列出或下载产物，支持 sha256 校验。</li>
+    <li><strong>模拟 git</strong> → <code>zgit_ls_remote</code>、<code>zgit_show</code>、<code>zgit_ls_tree</code>、<code>zgit_log</code>、<code>zgit_diff</code>、<code>zgit_status</code> 用平台 API 重新实现 git 的"读"侧。</li>
+    <li><strong>其他</strong> → <code>zgit_download</code> 下载任意直链进工作区，带字节上限与可选 sha256。</li>
+  </ul>
+  <p class="muted">支持 GitHub、GitLab（API v4，含嵌套分组）、Gitee（API v5），以及通用 GitHub 风格自建主机。完整说明见 <a href="https://github.com/zukunftsholz/dsh-zgit/blob/main/README.zh.md">README.zh.md</a>。</p>
+
+  <hr>
+  <footer>
+    <p>dsh-zgit · MIT License · <a href="https://github.com/zukunftsholz/dsh-zgit">github.com/zukunftsholz/dsh-zgit</a></p>
+  </footer>
+
+</main>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "dsh-zgit",
+  "alternateName": "zgit",
+  "applicationCategory": "DeveloperApplication",
+  "applicationSubCategory": "Version Control / Source Fetching",
+  "operatingSystem": "Windows, macOS, Linux",
+  "softwareVersion": "0.2.0",
+  "description": "dsh-zgit (zgit) is a DeepSeek Harness (dsh) plugin that fetches source archives and binary releases from git hosts (GitHub, GitLab, Gitee) over plain HTTPS. No git binary, no clone, zero runtime dependencies.",
+  "url": "https://zukunftsholz.github.io/dsh-zgit/",
+  "codeRepository": "https://github.com/zukunftsholz/dsh-zgit",
+  "softwareHelp": "https://github.com/zukunftsholz/dsh-zgit#readme",
+  "downloadUrl": "https://github.com/zukunftsholz/dsh-zgit/releases",
+  "license": "https://opensource.org/licenses/MIT",
+  "programmingLanguage": "TypeScript",
+  "isAccessibleForFree": true,
+  "keywords": "dsh-zgit, zgit, DeepSeek Harness, dsh plugin, git alternative, codeload, release download",
+  "author": { "@type": "Person", "name": "zukunftsholz", "url": "https://github.com/zukunftsholz" },
+  "isPartOf": { "@type": "SoftwareApplication", "name": "DeepSeek Harness", "url": "https://github.com/deepseek-ai/deepseek-harness" }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "What is dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "dsh-zgit (zgit) is a DeepSeek Harness plugin that fetches source archives and release assets from git hosts over plain HTTPS. It needs no git binary and adds no runtime dependencies." } },
+    { "@type": "Question", "name": "Do I need git installed to use dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything runs over HTTPS against the forge's archive, raw-file and release endpoints." } },
+    { "@type": "Question", "name": "Which git hosts does dsh-zgit support?", "acceptedAnswer": { "@type": "Answer", "text": "GitHub, GitLab (API v4, nested groups) and Gitee (API v5), plus generic GitHub-style self-hosted hosts (Gitea, GitHub Enterprise) for archive/raw URL guessing." } },
+    { "@type": "Question", "name": "How do I install dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "Run: dsh plugin --profile web add github:zukunftsholz/dsh-zgit" } },
+    { "@type": "Question", "name": "Is dsh-zgit a replacement for git?", "acceptedAnswer": { "@type": "Answer", "text": "It reimplements the read side of git (ls-remote, show, ls-tree, log, diff, status) over the forge APIs, plus release-asset download. It does not do writes or pushes." } },
+    { "@type": "Question", "name": "Are downloads verified?", "acceptedAnswer": { "@type": "Answer", "text": "Release assets and zgit_download support sha256 verification against shipped checksum files. Zip entries are CRC32-verified and gzip is decompressed under a hard cap." } },
+    { "@type": "Question", "name": "Which DSH version does dsh-zgit target?", "acceptedAnswer": { "@type": "Answer", "text": "DSH 0.1.5-rc.2 (cordis 4.0.2, schemastery 3.18.2)." } },
+    { "@type": "Question", "name": "What license is dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "MIT." } }
+  ]
+}
+</script>
+</body>
+</html>
