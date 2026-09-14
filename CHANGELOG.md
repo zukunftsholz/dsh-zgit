@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 
 ## [0.2.2] - 2026-09-14
 
+### Added
+
+- Published to npm as [`dsh-zgit@0.2.2`](https://www.npmjs.com/package/dsh-zgit).
+  `dsh plugin --profile <name> add dsh-zgit` installs from the registry in about
+  three seconds: no Git fetch, no build script, no `allowBuilds` entry. The Git
+  and local-checkout install forms still work.
+
 ### Changed
 
 - **Dropped the `prepare` script.** pnpm refuses to install a git-hosted

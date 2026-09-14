@@ -2,6 +2,9 @@
 
 [English](./README.md) | 中文
 
+[![npm](https://img.shields.io/npm/v/dsh-zgit.svg)](https://www.npmjs.com/package/dsh-zgit)
+[![license](https://img.shields.io/npm/l/dsh-zgit.svg)](./LICENSE)
+
 **dsh-zgit**（`/zgit` 插件）是一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（dsh）插件：当需要从 git 仓库拉取源代码或二进制发行版时，第一想法不再是 `git clone`，而是更敏捷的纯 HTTPS 方案（甚至直接"模拟 git"）。
 
 它**无需 git 二进制、零运行时依赖**：
@@ -14,7 +17,9 @@
 - **其他一切** → `zgit_download` 把任意直链（镜像、工具链）下载进工作区，带字节上限与可选 sha256。
 
 ```sh
-dsh plugin --profile web add github:zukunftsholz/dsh-zgit
+dsh plugin --profile web add dsh-zgit
+# ……或从 Git 安装（不需要 npm 账号）：
+# dsh plugin --profile web add github:zukunftsholz/dsh-zgit
 # ……或本地检出目录：
 # dsh plugin --profile web add ./dsh-zgit
 ```
@@ -112,7 +117,7 @@ dsh-zgit（zgit）是一个 DeepSeek Harness 插件，通过纯 HTTPS 从 git �
 GitHub、GitLab（API v4，支持嵌套分组）、Gitee（API v5）。通用 GitHub 风格自建主机（Gitea、GitHub Enterprise）的归档/原始文件 URL 可用；依赖 API 的操作会明确报错，可改用 `archiveUrl` 或 `zgit_download`。
 
 **怎么安装？**
-`dsh plugin --profile web add github:zukunftsholz/dsh-zgit`，本地检出用 `./dsh-zgit`。
+`dsh plugin --profile web add dsh-zgit`（npm 已发布）。也可以用 Git 形式 `github:zukunftsholz/dsh-zgit`，或本地检出目录 `./dsh-zgit`。
 
 **它能替代 git 吗？**
 它用平台 API 重新实现了 git 的"读"侧（`ls-remote`、`show`、`ls-tree`、`log`、`diff`、`status`），外加发行版产物下载；不做写操作、不 push。

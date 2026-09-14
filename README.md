@@ -2,6 +2,9 @@
 
 English | [中文](./README.zh.md)
 
+[![npm](https://img.shields.io/npm/v/dsh-zgit.svg)](https://www.npmjs.com/package/dsh-zgit)
+[![license](https://img.shields.io/npm/l/dsh-zgit.svg)](./LICENSE)
+
 > [!TIP]
 > **第一个《世界计划》本地化知识库，为同人作者和考据党而生：[SekaiSync](https://github.com/omoinoki/sekaisync)**  
 > **The first *Project SEKAI* localization knowledge base, built for fan creators and lore enthusiasts: [SekaiSync](https://github.com/omoinoki/sekaisync)**
@@ -21,7 +24,9 @@ It fetches over plain HTTPS, with **no git binary** and **zero runtime dependenc
 - **Anything else** → `zgit_download` fetches any direct URL (mirrors, toolchains) into the workspace with a byte cap and optional sha256.
 
 ```
-dsh plugin --profile web add github:zukunftsholz/dsh-zgit
+dsh plugin --profile web add dsh-zgit
+# …or from Git (no npm account needed):
+# dsh plugin --profile web add github:zukunftsholz/dsh-zgit
 # …or from a local checkout:
 # dsh plugin --profile web add ./dsh-zgit
 ```
@@ -119,7 +124,7 @@ No. Everything runs over HTTPS against the forge's archive, raw-file, and releas
 GitHub, GitLab (API v4, nested groups), and Gitee (API v5). Generic GitHub-style self-hosted hosts (Gitea, GitHub Enterprise) work for archive/raw URL guessing; API-backed operations return a clear error and fall back to `archiveUrl` or `zgit_download`.
 
 **How do I install it?**
-`dsh plugin --profile web add github:zukunftsholz/dsh-zgit` — or `./dsh-zgit` for a local checkout.
+`dsh plugin --profile web add dsh-zgit` — the package is on npm. The Git form (`github:zukunftsholz/dsh-zgit`) and a local checkout (`./dsh-zgit`) work too.
 
 **Is it a git replacement?**
 It reimplements the read side of git (`ls-remote`, `show`, `ls-tree`, `log`, `diff`, `status`) over the forge APIs, plus release-asset download. It does not do writes or pushes.

@@ -5,7 +5,8 @@
 dsh-zgit reimplements the read side of git over forge APIs, so a DSH agent can obtain source code and release artifacts without a git binary on the machine.
 
 Key facts:
-- Install: `dsh plugin --profile web add github:zukunftsholz/dsh-zgit`
+- npm package: `dsh-zgit` (https://www.npmjs.com/package/dsh-zgit), latest 0.2.2
+- Install: `dsh plugin --profile web add dsh-zgit` — or from Git: `dsh plugin --profile web add github:zukunftsholz/dsh-zgit`
 - Targets DeepSeek Harness 0.1.5-rc.2 (cordis 4.0.2, schemastery 3.18.2).
 - Zero runtime dependencies (Node builtins only). No git binary required.
 - Tools: zgit_ls_remote, zgit_clone, zgit_fetch_release, zgit_show, zgit_ls_tree, zgit_log, zgit_diff, zgit_status, zgit_download — plus a human-plane `/zgit` slash command.
@@ -17,6 +18,7 @@ Key facts:
 ## Links
 
 - Homepage: https://zukunftsholz.github.io/dsh-zgit/
+- npm: https://www.npmjs.com/package/dsh-zgit
 - Source code: https://github.com/zukunftsholz/dsh-zgit
 - Releases: https://github.com/zukunftsholz/dsh-zgit/releases
 - Issues: https://github.com/zukunftsholz/dsh-zgit/issues

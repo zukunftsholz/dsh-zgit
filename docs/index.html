@@ -70,7 +70,7 @@
 
   <div class="card">
     <strong>Install</strong>
-    <pre>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</pre>
+    <pre>dsh plugin --profile web add dsh-zgit</pre>
   </div>
 
   <h2>What is dsh-zgit?</h2>
@@ -118,7 +118,7 @@
     <h3>Which git hosts are supported?</h3>
     <p>GitHub, GitLab (API v4, nested groups) and Gitee (API v5). Generic GitHub-style self-hosted hosts (Gitea, GitHub Enterprise) work for archive/raw URL guessing.</p>
     <h3>How do I install it?</h3>
-    <p><code>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</code> — or <code>./dsh-zgit</code> for a local checkout.</p>
+    <p><code>dsh plugin --profile web add dsh-zgit</code> — the package is on npm. The Git form <code>github:zukunftsholz/dsh-zgit</code> and a local checkout (<code>./dsh-zgit</code>) work too.</p>
     <h3>Is it a git replacement?</h3>
     <p>It reimplements the read side of git (<code>ls-remote</code>, <code>show</code>, <code>ls-tree</code>, <code>log</code>, <code>diff</code>, <code>status</code>) over the forge APIs, plus release-asset download. It does not do writes or pushes.</p>
     <h3>Are downloads verified?</h3>
@@ -134,7 +134,7 @@
   <h2 id="zh">中文简介</h2>
   <p><strong>dsh-zgit</strong>（<code>/zgit</code> 插件）是一个 <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>（dsh）插件：当需要从 git 仓库拉取源代码或二进制发行版时，第一想法不再是 <code>git clone</code>，而是更敏捷的纯 HTTPS 方案。它<strong>无需 git 二进制、零运行时依赖</strong>。</p>
   <p>安装：</p>
-  <pre>dsh plugin --profile web add github:zukunftsholz/dsh-zgit</pre>
+  <pre>dsh plugin --profile web add dsh-zgit</pre>
   <ul>
     <li><strong>源代码</strong> → 下载代码托管平台的源码归档（codeload 风格 tar.gz/zip），解压成带 <code>.zerogit</code> 元数据的模拟检出目录。</li>
     <li><strong>二进制发行版</strong> → 从 GitHub / GitLab / Gitee 的 Releases 列出或下载产物，支持 sha256 校验。</li>
@@ -182,7 +182,7 @@
     { "@type": "Question", "name": "What is dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "dsh-zgit (zgit) is a DeepSeek Harness plugin that fetches source archives and release assets from git hosts over plain HTTPS. It needs no git binary and adds no runtime dependencies." } },
     { "@type": "Question", "name": "Do I need git installed to use dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "No. Everything runs over HTTPS against the forge's archive, raw-file and release endpoints." } },
     { "@type": "Question", "name": "Which git hosts does dsh-zgit support?", "acceptedAnswer": { "@type": "Answer", "text": "GitHub, GitLab (API v4, nested groups) and Gitee (API v5), plus generic GitHub-style self-hosted hosts (Gitea, GitHub Enterprise) for archive/raw URL guessing." } },
-    { "@type": "Question", "name": "How do I install dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "Run: dsh plugin --profile web add github:zukunftsholz/dsh-zgit" } },
+    { "@type": "Question", "name": "How do I install dsh-zgit?", "acceptedAnswer": { "@type": "Answer", "text": "Run: dsh plugin --profile web add dsh-zgit (the package is published on npm as dsh-zgit). A Git install works too: dsh plugin --profile web add github:zukunftsholz/dsh-zgit" } },
     { "@type": "Question", "name": "Is dsh-zgit a replacement for git?", "acceptedAnswer": { "@type": "Answer", "text": "It reimplements the read side of git (ls-remote, show, ls-tree, log, diff, status) over the forge APIs, plus release-asset download. It does not do writes or pushes." } },
     { "@type": "Question", "name": "Are downloads verified?", "acceptedAnswer": { "@type": "Answer", "text": "Release assets and zgit_download support sha256 verification against shipped checksum files. Zip entries are CRC32-verified and gzip is decompressed under a hard cap." } },
     { "@type": "Question", "name": "Which DSH version does dsh-zgit target?", "acceptedAnswer": { "@type": "Answer", "text": "DSH 0.1.5-rc.2 (cordis 4.0.2, schemastery 3.18.2)." } },
