@@ -69,7 +69,7 @@ All config lives in the plugin row (`$DSH_HOME/cordis.patch.yml`, the profile pa
     maxDiffChars: 100000
     maxExtractedEntries: 100000
     workspaceRoot: ''               # fallback root (defaults to process.cwd()); tool calls prefer the calling session workspace
-    userAgent: dsh-zgit/0.2.0
+    userAgent: dsh-zgit/0.2.1
     tokenEnv: { github: GITHUB_TOKEN, gitlab: '', gitee: '' }   # env var names
     tokens:   { github: '', gitlab: '', gitee: '' }             # or direct values
 ```

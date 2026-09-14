@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.1] - 2026-09-14
+
+### Changed
+
+- Default User-Agent bumped to `dsh-zgit/0.2.1`.
+
+### Fixed
+
+- **Prebuilt `lib/` now ships in the repository.** It was gitignored, so
+  anything consuming a Git tag or tarball without running a build step — the
+  third-party plugin directories, the harness's own verification pass — got a
+  package whose `main` pointed at a file that was never produced, and the
+  plugin tree failed to load. `prepare` still rebuilds `lib/` on install, so
+  the committed output and a local build agree.
+- `npm test` now falls back to the project's own `@deepseek-ai/*` packages
+  when the installed DSH profile does not carry the whole peer set the suite
+  imports. A profile stores `cordis` under a hashed directory, so aliasing
+  every `@deepseek-ai/*` import at the profile still resolved `dsh-tools` but
+  not `cordis`. A profile with a complete peer set is still preferred.
+
 ## [0.2.0] - 2026-09-14
 
 ### Changed

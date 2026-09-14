@@ -6,7 +6,13 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.md text eol=lf
-*.sh text eol=lf eol=lf
+*.sh text eol=lf
 LICENSE text eol=lf
 
 *.tgz binary
+
+# lib/ is the committed output of src/ (see CHANGELOG 0.2.1): consumers that
+# install from a Git tag or tarball have to be able to load the plugin without
+# running a build step. scripts/build.sh regenerates it. Mark it generated so
+# review tools fold the diff away instead of asking for a line-by-line read.
+lib/** linguist-generated=true

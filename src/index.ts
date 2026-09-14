@@ -97,7 +97,7 @@ export const Config: z<Config> = z.object({
   maxDiffChars: z.number().default(100_000),
   maxExtractedEntries: z.number().default(100_000),
   workspaceRoot: z.string().default(process.cwd()),
-  userAgent: z.string().default('dsh-zgit/0.2.0'),
+  userAgent: z.string().default('dsh-zgit/0.2.1'),
   tokens: z.object({
     github: z.string().default(''),
     gitlab: z.string().default(''),
