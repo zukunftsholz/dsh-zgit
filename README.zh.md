@@ -62,7 +62,7 @@ dsh plugin --profile web add github:zukunftsholz/dsh-zgit
     maxDiffChars: 100000
     maxExtractedEntries: 100000
     workspaceRoot: ''               # 兜底根（默认 process.cwd()）；工具调用优先使用调用方会话工作区
-    userAgent: dsh-zgit/0.2.1
+    userAgent: dsh-zgit/0.2.2
     tokenEnv: { github: GITHUB_TOKEN, gitlab: '', gitee: '' }   # 环境变量名
     tokens:   { github: '', gitlab: '', gitee: '' }             # 或直接填 token
 ```

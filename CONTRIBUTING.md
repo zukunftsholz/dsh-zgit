@@ -12,7 +12,12 @@ Issues and pull requests are welcome. Before opening a change:
    running a build step, so the compiled output travels with `src/`. Run
    `npm run build` and include the regenerated `lib/` in the same commit as any
    change under `src/`, or the two drift apart.
-4. Tests resolve `@deepseek-ai/*` against the installed DSH profile
+4. There is deliberately **no `prepare` script.** pnpm rejects a git-hosted
+   package that declares an install-time build script unless the exact spec is
+   allowlisted under `allowBuilds`, which would break
+   `dsh plugin --profile <name> add github:zukunftsholz/dsh-zgit`. `prepack`
+   rebuilds `lib/` for `npm publish` instead. Do not reintroduce `prepare`.
+5. Tests resolve `@deepseek-ai/*` against the installed DSH profile
    (`$DSH_HOME/profiles/node_modules`) when it carries the full peer set the
    suite imports, falling back to the project's own `node_modules` otherwise.
 

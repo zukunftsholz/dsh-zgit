@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.2.2] - 2026-09-14
+
+### Changed
+
+- **Dropped the `prepare` script.** pnpm refuses to install a git-hosted
+  package that declares an install-time build script unless its exact spec is
+  allowlisted under `allowBuilds`, so `dsh plugin --profile <name> add
+  github:zukunftsholz/dsh-zgit` died with `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED`
+  before `lib/` was ever looked at. The build does not belong on the install
+  path any more: `lib/` ships in the repository. `prepack` runs the same build
+  for `npm publish`, which is the one place a fresh compile is still wanted.
+- Default User-Agent bumped to `dsh-zgit/0.2.2`.
+
+### Fixed
+
+- The 0.2.1 notes claimed `prepare` still rebuilt `lib/` on install. On pnpm it
+  never got the chance to: the install was rejected first. Removing the script
+  is what actually unblocks `dsh plugin add` from a Git tag.
+
 ## [0.2.1] - 2026-09-14
 
 ### Changed

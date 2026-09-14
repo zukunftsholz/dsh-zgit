@@ -1,7 +1,7 @@
 {
   "name": "dsh-zgit",
   "description": "Zero-git: fetch source code and binary releases from git hosts over plain HTTPS — no git binary, no clone. Simulates git for the DeepSeek Harness.",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "prepare": "node scripts/build.mjs",
+    "prepack": "node scripts/build.mjs",
     "typecheck": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
     "check": "npm run typecheck && npm run build",
     "test": "node node_modules/vitest/vitest.mjs run --config ./vitest.config.ts"
