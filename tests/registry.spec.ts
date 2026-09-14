@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
-import { CallId } from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import * as zgit from '../src/index.ts'
 import { setFetchImpl } from '../src/http.ts'
 import { clearForgeCaches } from '../src/forge.ts'
@@ -49,7 +49,7 @@ afterEach(async () => {
 /** Execute one tool through the real registry; fails the test on tool errors. */
 async function runTool(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
   const outcome = await ctx.tools.execute({
-    callId: CallId(`reg-${name}`),
+    callId: ToolCallId(`reg-${name}`),
     name,
     arguments: args,
     signal: new AbortController().signal,

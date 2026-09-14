@@ -29,7 +29,7 @@ import {
   resolveRefSmart,
   type SmartResolve,
 } from './forge.ts'
-import { httpBytes } from './http.ts'
+import { httpBytes, privateBypass } from './http.ts'
 import type {
   CheckoutMeta,
   CloneSummary,
@@ -320,6 +320,9 @@ export async function cloneSource(runtime: ZerogitRuntime, args: CloneArgs, opti
     signal,
     headers: { 'User-Agent': runtime.userAgent },
     maxBytes: runtime.maxArchiveBytes,
+    // Self-hosted forges / local e2e fixtures serve archives from private
+    // hosts; public hosts go through the SSRF guard either way.
+    allowPrivate: privateBypass(archiveUrl),
   })
   const kind = detectArchiveKind(archiveUrl, bytes)
   if (contentType !== undefined && contentType.includes('text/html')) {
@@ -638,12 +641,16 @@ function parseChecksumFile(content: string, fileName: string): string | undefine
 
 /** zgit_download: fetch any direct URL into the workspace. */
 export async function download(runtime: ZerogitRuntime, args: DownloadArgs, options: CallOptions = {}): Promise<DownloadResult> {
+  let parsed: URL
+  try { parsed = new URL(args.url) } catch { throw new ZgError(`invalid URL "${args.url}"`) }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') throw new ZgError(`URL must be http(s): "${args.url}"`)
   const workspace = createWorkspace(options.workspaceRoot ?? runtime.workspaceRoot)
-  const dest = workspace.resolve(args.path ?? (basename(new URL(args.url).pathname) || 'download.bin'))
+  const dest = workspace.resolve(args.path ?? (basename(parsed.pathname) || 'download.bin'))
   const { bytes, contentType } = await httpBytes(args.url, {
     signal: options.signal,
     headers: { 'User-Agent': runtime.userAgent },
     maxBytes: runtime.maxDownloadBytes,
+    allowPrivate: privateBypass(args.url),
   })
   const digest = sha256Of(bytes)
   if (args.sha256 !== undefined) {

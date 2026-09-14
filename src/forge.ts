@@ -6,7 +6,7 @@
  * @module dsh-zgit/forge
  */
 
-import { httpJson, httpText } from './http.ts'
+import { httpJson, httpText, privateBypass } from './http.ts'
 import { HttpError, RepoSpecError, ZgError } from './errors.ts'
 import type {
   CompareFile,
@@ -75,11 +75,21 @@ export function clearForgeCaches(): void {
   commitCache.clear()
 }
 
-/** Whether an error is a forge API rate-limit response (403/429 + message). */
+/** Whether an error is a forge API rate-limit response (403/429). */
 export function isRateLimitError(error: unknown): boolean {
-  return error instanceof HttpError
-    && (error.status === 403 || error.status === 429)
-    && /rate limit/i.test(error.message)
+  if (!(error instanceof HttpError)) return false
+  if (error.status === 429) return true
+  if (error.status === 403) {
+    const headers = (error as HttpError).headers ?? {}
+    const remaining = headers['x-ratelimit-remaining'] ?? headers['ratelimit-remaining'] ?? headers['x-rate-limit-remaining']
+    const retryAfter = headers['retry-after'] ?? headers['x-ratelimit-reset'] ?? headers['ratelimit-reset']
+    if (remaining === '0' || retryAfter !== undefined) return true
+    // Header-aware check above handles real forges; fall back to message
+    // for mocked fixtures and forges that omit rate-limit headers.
+    if (/rate limit/i.test(error.message)) return true
+    return false
+  }
+  return false
 }
 
 /** Actionable hint text for rate-limit errors, or undefined. */
@@ -437,10 +447,13 @@ export function rawUrlFor(repo: RepoRef, path: string, ref: string): string {
 export async function fetchRawFile(repo: RepoRef, path: string, ref: string, options: ApiCallOptions, maxBytes: number): Promise<{ text: string; truncated: boolean }> {
   if (repo.kind === 'gitlab') {
     const url = `${apiBase(repo.kind)}/projects/${projectPath(repo)}/repository/files/${encodeURIComponent(path)}/raw?ref=${encodeURIComponent(ref)}`
-    const { text, truncated } = await httpText(url, { signal: options.signal, headers: options.headers, maxBytes }, maxBytes)
+    // apiBase is the public forge API; self-hosted GitLab goes through rawUrlFor
+    // below, so the guard stays on here without breaking private fixtures.
+    const { text, truncated } = await httpText(url, { signal: options.signal, headers: options.headers, maxBytes, allowPrivate: privateBypass(url) }, maxBytes)
     return { text, truncated }
   }
-  const { text, truncated } = await httpText(rawUrlFor(repo, path, ref), { signal: options.signal, headers: options.headers, maxBytes }, maxBytes)
+  const rawUrl = rawUrlFor(repo, path, ref)
+  const { text, truncated } = await httpText(rawUrl, { signal: options.signal, headers: options.headers, maxBytes, allowPrivate: privateBypass(rawUrl) }, maxBytes)
   return { text, truncated }
 }
 

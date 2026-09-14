@@ -1,7 +1,7 @@
 {
   "name": "dsh-zgit",
   "description": "Zero-git: fetch source code and binary releases from git hosts over plain HTTPS — no git binary, no clone. Simulates git for the DeepSeek Harness.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -27,23 +27,24 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "prepare": "node scripts/build.mjs",
     "typecheck": "node node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
     "check": "npm run typecheck && npm run build",
     "test": "node node_modules/vitest/vitest.mjs run --config ./vitest.config.ts"
   },
   "peerDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-commands": ">=0.1.0-rc.5",
-    "@deepseek-ai/dsh-system-prompt": ">=0.1.0-rc.5",
-    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.5",
-    "@deepseek-ai/schemastery": "^3.18.1"
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-commands": ">=0.1.5-rc.2",
+    "@deepseek-ai/dsh-system-prompt": ">=0.1.5-rc.2",
+    "@deepseek-ai/dsh-tools": ">=0.1.5-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.2"
   },
   "devDependencies": {
-    "@deepseek-ai/cordis": "^4.0.1",
-    "@deepseek-ai/dsh-commands": ">=0.1.0-rc.5",
-    "@deepseek-ai/dsh-system-prompt": ">=0.1.0-rc.5",
-    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.5",
-    "@deepseek-ai/schemastery": "^3.18.1",
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-commands": ">=0.1.5-rc.2",
+    "@deepseek-ai/dsh-system-prompt": ">=0.1.5-rc.2",
+    "@deepseek-ai/dsh-tools": ">=0.1.5-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.2",
     "@types/node": "^24.0.0",
     "typescript": "^5.9.0",
     "vitest": "^4.0.0"
@@ -61,5 +62,6 @@
     "codeload",
     "release",
     "zero-git"
-  ]
+  ],
+  "author": "zukunftsholz"
 }

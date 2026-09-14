@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
-import { CallId } from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import * as zerogit from '../src/index.ts'
 import { setFetchImpl } from '../src/http.ts'
 import { buildTarGz } from './helpers/archives.ts'
@@ -104,7 +104,7 @@ describe('dsh-zgit plugin', () => {
 
       const result = await ctx.tools.execute({
         signal: new AbortController().signal,
-        callId: CallId('zgit-session-cwd'),
+        callId: ToolCallId('zgit-session-cwd'),
         name: 'zgit_clone',
         arguments: { repo: 'acme/tool' },
         agent: { session: { header: { id: 's1', cwd: sessionDir } } } as never,

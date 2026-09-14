@@ -27,6 +27,8 @@ export interface HttpOptions {
   headers?: Record<string, string>
   /** Byte cap on the response body; exceeding it throws TooLargeError. */
   maxBytes?: number
+  /** Allow private/loopback hosts (for local e2e tests and self-hosted forges). */
+  allowPrivate?: boolean
 }
 
 /** A capped binary download result. */
@@ -41,7 +43,6 @@ export interface HttpBytes {
 async function readCapped(response: Response, maxBytes: number, url: string): Promise<Uint8Array> {
   const reader = response.body?.getReader()
   if (reader === undefined) {
-    // No streaming body (unusual); fall back to arrayBuffer with a size check.
     const buffer = await response.arrayBuffer()
     if (buffer.byteLength > maxBytes) throw new TooLargeError(url, maxBytes)
     return new Uint8Array(buffer)
@@ -67,6 +68,117 @@ async function readCapped(response: Response, maxBytes: number, url: string): Pr
   return out
 }
 
+/** Parse one IPv4 octet that may be decimal, octal (`0177`), or hex (`0x7f`). */
+function parseIpPart(part: string): number | undefined {
+  let text = part.trim().toLowerCase()
+  if (text.length === 0) return undefined
+  let base = 10
+  if (text.startsWith('0x')) {
+    base = 16
+    text = text.slice(2)
+    if (text.length === 0 || !/^[0-9a-f]+$/.test(text)) return undefined
+  } else if (/^0[0-9]+$/.test(text)) {
+    base = 8
+    if (!/^[0-7]+$/.test(text)) return undefined
+  } else if (!/^[0-9]+$/.test(text)) {
+    return undefined
+  }
+  const value = parseInt(text, base)
+  if (!Number.isSafeInteger(value) || value < 0 || value > 4294967295) return undefined
+  return value
+}
+
+/** Normalize an IPv4-ish hostname to 4 octets; handles decimal/hex/octal parts. */
+function normalizeIPv4(host: string): [number, number, number, number] | undefined {
+  // Single-integer form: http://2130706433 (= 127.0.0.1), http://0x7f000001, ...
+  if (!host.includes('.') && !host.includes(':')) {
+    const value = parseIpPart(host)
+    if (value === undefined || value > 4294967295) return undefined
+    return [(value >>> 24) & 255, (value >>> 16) & 255, (value >>> 8) & 255, value & 255]
+  }
+  if (!/^[0-9a-fA-FxX.]+$/.test(host)) return undefined
+  const parts = host.split('.')
+  if (parts.length !== 4) return undefined
+  const octets: number[] = []
+  for (const part of parts) {
+    const value = parseIpPart(part)
+    if (value === undefined || value > 255) return undefined
+    octets.push(value)
+  }
+  return octets as [number, number, number, number]
+}
+
+function isPrivateIPv4(octets: [number, number, number, number]): boolean {
+  const [a, b] = octets
+  if (a === 127) return true
+  if (a === 10) return true
+  if (a === 192 && b === 168) return true
+  if (a === 172 && b >= 16 && b <= 31) return true
+  if (a === 169 && b === 254) return true
+  // CGNAT shared space (RFC 6598) is not publicly routable.
+  if (a === 100 && b >= 64 && b <= 127) return true
+  if (a === 0) return true
+  return false
+}
+
+/** Whether a hostname targets a private/loopback/link-local host (SSRF guard). */
+export function isPrivateHostname(host: string): boolean {
+  const h = host.toLowerCase().replace(/^\[|\]$/g, '').replace(/\.$/, '')
+  if (h.length === 0) return false
+  if (h === 'localhost' || h === 'metadata.google.internal') return true
+  if (h.endsWith('.local') || h.endsWith('.internal')) return true
+  // IPv6 (URL.hostname strips brackets): loopback, link-local, unique-local,
+  // unspecified, or embedded-IPv4 forms like ::ffff:127.0.0.1.
+  if (h.includes(':')) {
+    if (h === '::1' || h === '::' || h === '0:0:0:0:0:0:0:1' || h === '0:0:0:0:0:0:0:0') return true
+    if (h.startsWith('fe80:') || h.startsWith('fec0:') || h.startsWith('fc') || h.startsWith('fd')) return true
+    const embedded = h.split(':').pop() ?? ''
+    if (embedded.includes('.')) {
+      const octets = normalizeIPv4(embedded)
+      // Embedded private v4 (e.g. ::ffff:127.0.0.1) is private; any other
+      // embedded dotted quad is treated as private to fail closed.
+      if (octets === undefined || isPrivateIPv4(octets)) return true
+    }
+    // Global unicast (2000::/3) is public; every other v6 literal fails closed.
+    const compact = h.replace(/:/g, '')
+    if (/^[23][0-9a-f]/i.test(compact.slice(0, 2))) return false
+    return true
+  }
+  const octets = normalizeIPv4(h)
+  if (octets !== undefined) return isPrivateIPv4(octets)
+  return false
+}
+
+/** Whether a URL targets a private host; invalid URLs return false (callers validate separately). */
+export function isPrivateUrl(url: string): boolean {
+  try {
+    return isPrivateHostname(new URL(url).hostname)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * allowPrivate value for self-hosted forges / local e2e fixtures: bypass the
+ * SSRF guard only when the target itself is private; public hosts always go
+ * through the guard (which passes for them anyway).
+ */
+export function privateBypass(url: string): boolean {
+  return isPrivateUrl(url)
+}
+
+export function assertPublicUrl(url: string, allowPrivate = false): void {
+  let host: string
+  try { host = new URL(url).hostname } catch { throw new ZgError(`invalid URL "${url}"`) }
+  if (!allowPrivate && isPrivateHostname(host)) throw new ZgError(`refusing private/local URL "${url}" (SSRF guard)`)
+}
+
+function collectHeaders(response: Response): Record<string, string> {
+  const out: Record<string, string> = {}
+  response.headers.forEach((v, k) => { out[k.toLowerCase()] = v })
+  return out
+}
+
 /** Fetch a URL and return the response with structured error handling. */
 async function checkedFetch(url: string, options: HttpOptions, headers: Record<string, string>): Promise<Response> {
   let response: Response
@@ -82,11 +194,15 @@ async function checkedFetch(url: string, options: HttpOptions, headers: Record<s
 
 /** Fetch a URL as bytes with a cap, throwing HttpError/TooLargeError. */
 export async function httpBytes(url: string, options: HttpOptions = {}): Promise<HttpBytes> {
+  assertPublicUrl(url, options.allowPrivate === true)
   const headers: Record<string, string> = { ...options.headers }
   const response = await checkedFetch(url, options, headers)
   if (!response.ok) {
     const snippet = await response.text().catch(() => '')
-    throw new HttpError(url, response.status, snippet.slice(0, 500))
+    throw new HttpError(url, response.status, snippet.slice(0, 500), collectHeaders(response))
+  }
+  if (response.url) {
+    assertPublicUrl(response.url, options.allowPrivate === true)
   }
   const bytes = await readCapped(response, options.maxBytes ?? Infinity, url)
   return { bytes, url: response.url, contentType: response.headers.get('content-type') ?? undefined }

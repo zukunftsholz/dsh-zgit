@@ -19,7 +19,9 @@ English | [中文](./README.zh.md)
 - **Anything else** → `zgit_download` fetches any direct URL (mirrors, toolchains) into the workspace with a byte cap and optional sha256.
 
 ```
-dsh plugin --profile web add @zukunftsholz/dsh-zgit
+dsh plugin --profile web add github:zukunftsholz/dsh-zgit
+# …or from a local checkout:
+# dsh plugin --profile web add ./dsh-zgit
 ```
 
 ## Tools
@@ -65,7 +67,7 @@ All config lives in the plugin row (`$DSH_HOME/cordis.patch.yml`, the profile pa
     maxDiffChars: 100000
     maxExtractedEntries: 100000
     workspaceRoot: ''               # fallback root (defaults to process.cwd()); tool calls prefer the calling session workspace
-    userAgent: dsh-zgit/0.1.1
+    userAgent: dsh-zgit/0.2.0
     tokenEnv: { github: GITHUB_TOKEN, gitlab: '', gitee: '' }   # env var names
     tokens:   { github: '', gitlab: '', gitee: '' }             # or direct values
 ```
@@ -95,7 +97,7 @@ Tokens raise API rate limits and enable private repos; the env-var name wins ove
 
 ## Development
 
-The package has **zero runtime dependencies** (pure Node builtins: `node:zlib`, `node:crypto`, `node:fs`, `node:http`). Tests run against the installed DSH profile packages:
+The package has **zero runtime dependencies** (pure Node builtins: `node:zlib`, `node:crypto`, `node:fs`, `node:http`). It targets DSH **0.1.5-rc.2** (cordis 4.0.2, schemastery 3.18.2) and tests run against the installed DSH profile packages:
 
 ```sh
 npm run build      # scripts/build.sh (DSH checkout + junctions + tsc) via node wrapper

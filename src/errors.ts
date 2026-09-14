@@ -17,12 +17,14 @@ export class ZgError extends Error {
 export class HttpError extends ZgError {
   readonly status: number
   readonly url: string
+  readonly headers: Record<string, string>
 
-  constructor(url: string, status: number, detail: string) {
+  constructor(url: string, status: number, detail: string, headers: Record<string, string> = {}) {
     super(`HTTP ${status} from ${url}${detail.length > 0 ? `: ${detail}` : ''}`)
     this.name = 'HttpError'
     this.status = status
     this.url = url
+    this.headers = headers
   }
 }
 

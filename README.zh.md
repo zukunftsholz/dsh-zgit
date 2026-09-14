@@ -12,7 +12,9 @@
 - **其他一切** → `zgit_download` 把任意直链（镜像、工具链）下载进工作区，带字节上限与可选 sha256。
 
 ```sh
-dsh plugin --profile web add @zukunftsholz/dsh-zgit
+dsh plugin --profile web add github:zukunftsholz/dsh-zgit
+# ……或本地检出目录：
+# dsh plugin --profile web add ./dsh-zgit
 ```
 
 ## 工具一览
@@ -58,7 +60,7 @@ dsh plugin --profile web add @zukunftsholz/dsh-zgit
     maxDiffChars: 100000
     maxExtractedEntries: 100000
     workspaceRoot: ''               # 兜底根（默认 process.cwd()）；工具调用优先使用调用方会话工作区
-    userAgent: dsh-zgit/0.1.1
+    userAgent: dsh-zgit/0.2.0
     tokenEnv: { github: GITHUB_TOKEN, gitlab: '', gitee: '' }   # 环境变量名
     tokens:   { github: '', gitlab: '', gitee: '' }             # 或直接填 token
 ```
@@ -88,7 +90,7 @@ Token 可提高 API 限流配额并支持私有仓库；环境变量名优先于
 
 ## 开发
 
-本包**零运行时依赖**（只用 Node 内置模块：`node:zlib`、`node:crypto`、`node:fs` 等）。测试直接针对已安装的 DSH profile 包运行：
+本包**零运行时依赖**（只用 Node 内置模块：`node:zlib`、`node:crypto`、`node:fs` 等），面向 DSH **0.1.5-rc.2**（cordis 4.0.2、schemastery 3.18.2）。测试直接针对已安装的 DSH profile 包运行：
 
 ```sh
 npm run build      # scripts/build.sh（DSH checkout + junction + tsc），由 node 包装器调用

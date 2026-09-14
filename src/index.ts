@@ -97,7 +97,7 @@ export const Config: z<Config> = z.object({
   maxDiffChars: z.number().default(100_000),
   maxExtractedEntries: z.number().default(100_000),
   workspaceRoot: z.string().default(process.cwd()),
-  userAgent: z.string().default('dsh-zgit/0.1.1'),
+  userAgent: z.string().default('dsh-zgit/0.2.0'),
   tokens: z.object({
     github: z.string().default(''),
     gitlab: z.string().default(''),
@@ -123,7 +123,7 @@ const ZGIT_PROMPT_SECTION = {
 - zgit_show — fetch one raw file at a ref; zgit_ls_tree / zgit_log / zgit_diff / zgit_ls_remote — inspect without downloading.
 - zgit_status — check whether a previous zgit checkout fell behind the remote.
 - zgit_download — fetch any direct URL (mirrors, toolchains) into the workspace.
-Reach for the real git binary only when you must commit, push, or rewrite history.`,
+zgit targets repository content (archives, releases, raw files) and writes into the workspace; for plain web pages use the built-in web_fetch tool instead. Reach for the real git binary only when you must commit, push, or rewrite history.`,
 }
 
 /** Config values must be positive integers where they are limits. */
@@ -213,5 +213,6 @@ export { parseRepoSpec, apiBase, archiveUrlFor, rawUrlFor, fetchDefaultBranch, f
 export { extractArchive, detectArchiveKind, sanitizeEntryPath, type ArchiveKind, type ExtractOptions, type ExtractSummary } from './archive.ts'
 export { matchGlob, sha256Of, readCheckoutMeta, lossless, cloneSource, showFile, lsTree, log, diff, status, fetchReleaseAssets, download, lsRemote, errorMessage } from './core.ts'
 export { tokenize, parseFlags, runZgitCommand } from './command.ts'
+export { isPrivateHostname, isPrivateUrl, privateBypass, assertPublicUrl } from './http.ts'
 export { createWorkspace, safeDirName, type Workspace } from './fs-util.ts'
 export type { RepoRef, ResolvedCommit, RefEntry, TreeEntry, LogEntry, CompareFile, ReleaseAsset, ReleaseInfo, CloneSummary, CheckoutMeta, StatusResult, DownloadResult, ZerogitRuntime } from './types.ts'

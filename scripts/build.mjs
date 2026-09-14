@@ -22,13 +22,21 @@ function runBash() {
     if (existsSync(bin)) candidates.push(bin)
   }
   for (const bin of candidates) {
+    let result
     try {
-      const result = spawnSync(bin, ['scripts/build.sh'], { stdio: 'inherit' })
-      if (result.error && result.error.code === 'ENOENT') continue
-      process.exit(result.status ?? (result.error ? 1 : 0))
+      result = spawnSync(bin, ['scripts/build.sh'], { stdio: 'inherit' })
     } catch {
-      // try the next candidate
+      continue // try the next candidate
     }
+    if (result.error && result.error.code === 'ENOENT') continue
+    if (result.status === 0) process.exit(0)
+    // Bash exists but build.sh did not succeed — either a genuine build
+    // failure or a broken shell (e.g. a sandboxed Git Bash that cannot
+    // create signal pipes and crashes). Warn and fall through to the plain
+    // local tsc build below: it compiles the same tsconfig, so genuine
+    // compile errors surface again there instead of being masked.
+    console.warn(`build: ${bin} scripts/build.sh exited with ${result.status ?? result.error ?? 'unknown error'} — falling back to local tsc`)
+    return false
   }
   return false
 }
